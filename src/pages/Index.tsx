@@ -1,261 +1,136 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Icon from "@/components/ui/icon";
+import GameCard, { Game } from "@/components/GameCard";
 
-const games = [
-  { id: 1, title: "Shadows of Eternity", genre: "RPG", status: "active", testers: 24, rating: 4.8, reward: "500₽", img: "🧙", platform: "PC", deadline: "15 июня" },
-  { id: 2, title: "Neon Drift Racing", genre: "Гонки", status: "active", testers: 12, rating: 4.6, reward: "350₽", img: "🏎️", platform: "Mobile", deadline: "20 июня" },
-  { id: 3, title: "Dungeon Crawler X", genre: "Roguelike", status: "pending", testers: 8, rating: 0, reward: "750₽", img: "⚔️", platform: "PC", deadline: "25 июня" },
-  { id: 4, title: "Pixel Farm Tycoon", genre: "Симулятор", status: "active", testers: 31, rating: 4.9, reward: "200₽", img: "🌾", platform: "Mobile", deadline: "18 июня" },
-  { id: 5, title: "Void Protocol", genre: "Шутер", status: "active", testers: 19, rating: 4.7, reward: "600₽", img: "🔫", platform: "PC", deadline: "22 июня" },
-  { id: 6, title: "Celestial Arena", genre: "MOBA", status: "closed", testers: 45, rating: 4.5, reward: "900₽", img: "⭐", platform: "PC", deadline: "Завершён" },
+const filters = [
+  "Все игры", "Для вас", "Популярные", "Все игровые тесты",
+  "Демоверсии", "Инди", "Массовые", "Хоррор", "Выживание", "Уютные",
 ];
 
-const stats = [
-  { label: "Активных игр", value: "1,247", icon: "Gamepad2" },
-  { label: "Тестеров", value: "8,932", icon: "Users" },
-  { label: "Отчётов", value: "94,201", icon: "FileText" },
-  { label: "Выплачено", value: "₽12.4M", icon: "TrendingUp" },
-];
-
-const features = [
-  { icon: "Search", title: "Найди игру", desc: "Выбирай проекты по жанру, платформе и вознаграждению" },
-  { icon: "ClipboardList", title: "Тестируй", desc: "Проходи задания, фиксируй баги и отправляй обратную связь" },
-  { icon: "BarChart2", title: "Аналитика", desc: "Разработчики получают детальные отчёты и метрики" },
-  { icon: "Wallet", title: "Получай оплату", desc: "Автоматические выплаты после принятия отчёта" },
+const games: Game[] = [
+  { id: 1, title: "VELATO", desc: "VELATO — это однопользовательская игра в жанре...", img: "", gradient: "bg-gradient-to-br from-purple-900 via-indigo-900 to-orange-900", emoji: "🗺️", status: "green", testType: "Открытая бета-версия", meta: "7 дней на...", platforms: ["steam", "android"] },
+  { id: 2, title: "Отнимающие Время", desc: "Каждая прожитая секунда — это секунда, которую ты...", img: "", gradient: "bg-gradient-to-br from-fuchsia-900 via-purple-800 to-cyan-800", emoji: "⏳", status: "green", testType: "Закрытое бета-тестирование", meta: "26", platforms: ["steam", "android", "app"] },
+  { id: 3, title: "Королевская дорога игр...", desc: "Game of Thrones: Kingsroad — это ролевая игра в жанре...", img: "", gradient: "bg-gradient-to-br from-slate-800 via-stone-800 to-zinc-900", emoji: "🐉", status: "red", testType: "Закрытое бета-тестирование", meta: "1 м", platforms: ["steam", "epic", "app", "android"] },
+  { id: 4, title: "ВЗБАДРИВАЮЩИЕ ПОЧ...", desc: "Это не обычная футбольная игра. Это хаотичная битва на...", img: "", gradient: "bg-gradient-to-br from-orange-700 via-amber-600 to-yellow-700", emoji: "⚽", status: "red", testType: "Закрытое бета-тестирование", meta: "2 м", platforms: ["steam", "android"] },
+  { id: 5, title: "Ограничьте количество...", desc: "Limit Zero Breakers — динамичный экшен с аниме-стилисти...", img: "", gradient: "bg-gradient-to-br from-sky-800 via-blue-900 to-indigo-900", emoji: "⚔️", status: "green", testType: "Открытое бета-тестирование", meta: "5 дней на...", platforms: ["steam", "android"] },
+  { id: 6, title: "Ржавый Мобиль", desc: "Rust Anytime Everywhere — выживай в открытом мире на...", img: "", gradient: "bg-gradient-to-br from-orange-900 via-amber-800 to-stone-800", emoji: "🏜️", status: "green", testType: "Закрытое бета-тестирование", meta: "12", platforms: ["android", "app"] },
+  { id: 7, title: "Фарлайт 84", desc: "Farlight 84 — королевская битва с героями и техникой...", img: "", gradient: "bg-gradient-to-br from-lime-700 via-green-700 to-emerald-800", emoji: "🤖", status: "red", testType: "Закрытое бета-тестирование", meta: "3 м", platforms: ["steam", "epic", "android", "app"] },
+  { id: 8, title: "Мехараши", desc: "Mecharashi — тактическая RPG с гигантскими роботами...", img: "", gradient: "bg-gradient-to-br from-red-900 via-orange-900 to-stone-900", emoji: "🦾", status: "red", testType: "Закрытое бета-тестирование", meta: "8", platforms: ["android", "app"] },
 ];
 
 export default function Index() {
+  const [active, setActive] = useState("Все игровые тесты");
+
   return (
-    <div className="min-h-screen bg-[#0a0d12]">
+    <div className="min-h-screen bg-black">
       <Navbar />
 
-      {/* Hero */}
-      <section className="hero-bg relative pt-32 pb-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-green-500/5 blur-3xl" />
-          <div className="absolute top-60 -left-20 w-[400px] h-[400px] rounded-full bg-green-500/4 blur-3xl" />
+      {/* HERO — large featured game banner */}
+      <section className="relative h-[560px] w-full overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-950 via-stone-900 to-black">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_60%_40%,rgba(217,119,6,0.25),transparent)]" />
+          <div className="absolute inset-0 opacity-30 bg-[repeating-linear-gradient(90deg,transparent,transparent_40px,rgba(255,255,255,0.02)_40px,rgba(255,255,255,0.02)_80px)]" />
+          {/* fade to black bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent" />
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-400/10 border border-green-400/20 text-green-400 text-xs font-medium mb-6 animate-fade-up">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-              8,932 тестера онлайн прямо сейчас
-            </div>
+        {/* Floating game emoji art */}
+        <div className="absolute right-[10%] top-1/2 -translate-y-1/2 text-[180px] opacity-20 select-none hidden lg:block">🏰</div>
 
-            <h1 className="text-5xl md:text-7xl font-['Rajdhani'] font-bold text-white leading-tight mb-6 animate-fade-up animate-delay-100">
-              Платформа для<br />
-              <span className="neon-text">тестирования игр</span>
+        {/* Content */}
+        <div className="relative z-10 max-w-[1600px] mx-auto px-6 lg:px-12 h-full flex items-center">
+          <div className="max-w-xl pt-16">
+            <h1 className="font-black text-5xl md:text-6xl text-blue-400 mb-6 tracking-tight animate-fade-up" style={{ fontFamily: "Inter", textShadow: "0 0 30px rgba(96,165,250,0.5)" }}>
+              BALLGAME
             </h1>
-
-            <p className="text-lg text-slate-400 mb-10 max-w-xl leading-relaxed animate-fade-up animate-delay-200">
-              Соединяем разработчиков с профессиональными тестерами. Находи баги быстрее, улучшай качество, выпускай игры уверенно.
+            <p className="text-white/75 text-[17px] leading-relaxed mb-5 max-w-md animate-fade-up animate-delay-100">
+              Цельтесь, прыгайте, бейте и крушите в Ballgame — дерзком физическом платформере, где вы и есть мяч. Участвуйте в...
             </p>
-
-            <div className="flex flex-wrap gap-4 animate-fade-up animate-delay-300">
-              <Link to="/games" className="neon-btn px-8 py-3.5 rounded-xl text-base flex items-center gap-2">
-                <Icon name="Gamepad2" size={18} />
-                Найти игры для тестирования
+            <p className="text-white/60 text-[14px] font-semibold mb-7 animate-fade-up animate-delay-100">
+              Платформер, аркада <span className="mx-1.5">•</span> Демо
+            </p>
+            <div className="flex items-center gap-3 animate-fade-up animate-delay-200">
+              <Link to="/games/100" className="btn-white px-8 py-3.5 rounded-xl text-[15px]">
+                Узнайте больше
               </Link>
-              <Link to="/games" className="px-8 py-3.5 rounded-xl text-base border border-white/10 text-white hover:bg-white/5 transition-all flex items-center gap-2 font-['Rajdhani'] font-semibold">
-                <Icon name="PlusCircle" size={18} />
-                Добавить свою игру
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats row */}
-        <div className="max-w-7xl mx-auto mt-20 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((s, i) => (
-              <div key={i} className="glass-card rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-green-400/10 flex items-center justify-center">
-                    <Icon name={s.icon as any} size={16} className="text-green-400" />
-                  </div>
-                  <span className="text-xs text-slate-500 font-medium">{s.label}</span>
-                </div>
-                <div className="text-2xl font-['Rajdhani'] font-bold text-white">{s.value}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <span className="text-xs font-medium text-green-400 tracking-widest uppercase">Как это работает</span>
-            <h2 className="text-4xl font-['Rajdhani'] font-bold text-white mt-2">Просто. Быстро. Эффективно.</h2>
-          </div>
-          <div className="grid md:grid-cols-4 gap-6">
-            {features.map((f, i) => (
-              <div key={i} className="glass-card rounded-xl p-6 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 text-[120px] font-['Orbitron'] font-black text-white/[0.02] leading-none select-none">
-                  {i + 1}
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-green-400/10 border border-green-400/20 flex items-center justify-center mb-4 group-hover:bg-green-400/15 transition-all">
-                  <Icon name={f.icon as any} size={22} className="text-green-400" />
-                </div>
-                <h3 className="text-lg font-['Rajdhani'] font-bold text-white mb-2">{f.title}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Games catalog */}
-      <section className="py-20 px-4 border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <span className="text-xs font-medium text-green-400 tracking-widest uppercase">Каталог</span>
-              <h2 className="text-4xl font-['Rajdhani'] font-bold text-white mt-1">Открытые проекты</h2>
-            </div>
-            <Link to="/games" className="flex items-center gap-2 text-sm text-slate-400 hover:text-green-400 transition-colors font-medium">
-              Все проекты <Icon name="ArrowRight" size={16} />
-            </Link>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mb-8">
-            {["Все", "PC", "Mobile", "Console", "RPG", "Шутер", "MOBA"].map((f, i) => (
-              <button
-                key={i}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  i === 0
-                    ? "bg-green-400/15 text-green-400 border border-green-400/30"
-                    : "text-slate-500 border border-white/10 hover:border-white/20 hover:text-white"
-                }`}
-              >
-                {f}
+              <button className="w-12 h-12 rounded-xl border border-white/25 flex items-center justify-center text-white/80 hover:bg-white/10 transition-colors">
+                <Icon name="Bookmark" size={20} />
               </button>
-            ))}
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {games.map((g) => (
-              <Link to={`/games/${g.id}`} key={g.id} className="glass-card rounded-xl overflow-hidden group block">
-                <div className="h-36 bg-gradient-to-br from-slate-800/50 to-slate-900/80 flex items-center justify-center text-6xl relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d12]/60 to-transparent" />
-                  <span className="relative z-10">{g.img}</span>
-                  <div className="absolute top-3 right-3 z-10">
-                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-wide ${
-                      g.status === "active" ? "badge-active" :
-                      g.status === "pending" ? "badge-pending" : "badge-closed"
-                    }`}>
-                      {g.status === "active" ? "АКТИВЕН" : g.status === "pending" ? "СКОРО" : "ЗАКРЫТ"}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-3 left-3 z-10">
-                    <span className="px-2 py-0.5 rounded-md text-[10px] bg-black/50 text-slate-300 border border-white/10">
-                      {g.platform}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-['Rajdhani'] font-bold text-white text-lg leading-tight group-hover:text-green-400 transition-colors">
-                        {g.title}
-                      </h3>
-                      <span className="text-xs text-slate-500">{g.genre}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-green-400 font-['Rajdhani'] font-bold text-lg">{g.reward}</div>
-                      <div className="text-[10px] text-slate-600">вознаграждение</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <div className="flex items-center gap-1">
-                      <Icon name="Users" size={11} />
-                      {g.testers} тестеров
-                    </div>
-                    {g.rating > 0 && (
-                      <div className="flex items-center gap-1 text-yellow-400">
-                        <Icon name="Star" size={11} />
-                        {g.rating}
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <Icon name="Clock" size={11} />
-                      {g.deadline}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Banner */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="rounded-2xl border border-green-400/20 bg-gradient-to-r from-green-400/5 via-transparent to-green-400/5 p-12 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(34,197,94,0.08),transparent)]" />
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-['Rajdhani'] font-bold text-white mb-4">
-                Готов стать тестером?
-              </h2>
-              <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-                Присоединяйся к тысячам тестеров — зарабатывай, улучшая игры
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center">
-                <Link to="/testers" className="neon-btn px-8 py-3.5 rounded-xl text-base">
-                  Стать тестером
-                </Link>
-                <Link to="/games" className="px-8 py-3.5 rounded-xl text-base border border-white/10 text-white hover:bg-white/5 transition-all font-['Rajdhani'] font-semibold">
-                  Узнать больше
-                </Link>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/5 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-10 mb-10">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg neon-border flex items-center justify-center">
-                  <Icon name="Gamepad2" size={14} className="text-green-400" />
-                </div>
-                <span className="font-['Orbitron'] font-bold text-white text-sm">PLAY<span className="neon-text">TESTER</span></span>
+      {/* FILTER CHIPS */}
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-12 -mt-2 relative z-20">
+        <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-2">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setActive(f)}
+              className={`shrink-0 px-5 py-2.5 rounded-full text-[14px] whitespace-nowrap flex items-center gap-1.5 ${
+                active === f ? "chip chip-active" : "chip"
+              }`}
+            >
+              {f}
+              {f === "Все игровые тесты" && <Icon name="ChevronDown" size={14} />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* GAME GRID */}
+      <section className="max-w-[1600px] mx-auto px-6 lg:px-12 pt-8 pb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-8">
+          {games.map((g) => (
+            <GameCard key={g.id} game={g} />
+          ))}
+        </div>
+
+        <div className="flex justify-center mt-14">
+          <Link to="/games" className="px-8 py-3.5 rounded-full border border-white/20 text-white font-semibold text-[15px] hover:bg-white/5 transition-colors">
+            Показать больше игр
+          </Link>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-white/10 py-14 px-6 lg:px-12">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="grid md:grid-cols-5 gap-10 mb-10">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2.5 mb-4">
+                <Icon name="Navigation" size={20} className="text-white -rotate-45" />
+                <span className="font-bold text-white text-lg">Playtester</span>
               </div>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Платформа для профессионального тестирования игр
+              <p className="text-[14px] text-white/40 max-w-xs leading-relaxed">
+                Платформа для тестирования игр. Находи проекты, тестируй и помогай разработчикам делать игры лучше.
               </p>
             </div>
             {[
-              { title: "Платформа", links: ["Каталог игр", "Тестеры", "Аналитика", "Сообщения"] },
-              { title: "Разработчикам", links: ["Добавить проект", "Тарифы", "API", "Документация"] },
-              { title: "Поддержка", links: ["Справочный центр", "Контакты", "Политика", "О нас"] },
+              { title: "Платформа", links: ["Исследовать", "Категории", "Тестеры", "Аналитика"] },
+              { title: "Компания", links: ["О нас", "Блог", "Карьера", "Контакты"] },
+              { title: "Поддержка", links: ["Справка", "Правила", "Конфиденциальность", "FAQ"] },
             ].map((col, i) => (
               <div key={i}>
-                <h4 className="font-['Rajdhani'] font-bold text-white text-sm tracking-wider mb-4">{col.title}</h4>
-                <ul className="space-y-2">
+                <h4 className="font-bold text-white text-[14px] mb-4">{col.title}</h4>
+                <ul className="space-y-2.5">
                   {col.links.map((l, j) => (
-                    <li key={j}>
-                      <a href="#" className="text-sm text-slate-600 hover:text-slate-300 transition-colors">{l}</a>
-                    </li>
+                    <li key={j}><a href="#" className="text-[14px] text-white/40 hover:text-white transition-colors">{l}</a></li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <span className="text-xs text-slate-700">© 2024 PlayTester. Все права защищены.</span>
-            <div className="flex items-center gap-4">
-              {["Twitter", "Github", "Discord"].map((s, i) => (
-                <a key={i} href="#" className="text-xs text-slate-700 hover:text-slate-400 transition-colors">{s}</a>
+          <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <span className="text-[13px] text-white/30">© 2024 Playtester. Все права защищены.</span>
+            <div className="flex gap-4">
+              {["Twitter", "Discord", "YouTube"].map((s, i) => (
+                <a key={i} href="#" className="text-[13px] text-white/30 hover:text-white/60 transition-colors">{s}</a>
               ))}
             </div>
           </div>

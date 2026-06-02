@@ -2,138 +2,101 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Icon from "@/components/ui/icon";
+import GameCard, { Game } from "@/components/GameCard";
 
-const allGames = [
-  { id: 1, title: "Shadows of Eternity", genre: "RPG", status: "active", testers: 24, rating: 4.8, reward: "500₽", img: "🧙", platform: "PC", deadline: "15 июня", desc: "Тёмное фэнтези с открытым миром и тактическими боями" },
-  { id: 2, title: "Neon Drift Racing", genre: "Гонки", status: "active", testers: 12, rating: 4.6, reward: "350₽", img: "🏎️", platform: "Mobile", deadline: "20 июня", desc: "Аркадные гонки с неоновой эстетикой" },
-  { id: 3, title: "Dungeon Crawler X", genre: "Roguelike", status: "pending", testers: 8, rating: 0, reward: "750₽", img: "⚔️", platform: "PC", deadline: "25 июня", desc: "Процедурно генерируемые подземелья и случайные события" },
-  { id: 4, title: "Pixel Farm Tycoon", genre: "Симулятор", status: "active", testers: 31, rating: 4.9, reward: "200₽", img: "🌾", platform: "Mobile", deadline: "18 июня", desc: "Управляй фермой в пиксельном стиле" },
-  { id: 5, title: "Void Protocol", genre: "Шутер", status: "active", testers: 19, rating: 4.7, reward: "600₽", img: "🔫", platform: "PC", deadline: "22 июня", desc: "Шутер от первого лица в антиутопическом мире" },
-  { id: 6, title: "Celestial Arena", genre: "MOBA", status: "closed", testers: 45, rating: 4.5, reward: "900₽", img: "⭐", platform: "PC", deadline: "Завершён", desc: "5v5 командная битва с уникальными героями" },
-  { id: 7, title: "Zombie Fortress", genre: "Стратегия", status: "active", testers: 15, rating: 4.4, reward: "450₽", img: "🧟", platform: "PC", deadline: "28 июня", desc: "Строй укрепления и отражай волны зомби" },
-  { id: 8, title: "Stellar Voyage", genre: "Adventure", status: "pending", testers: 5, rating: 0, reward: "1200₽", img: "🚀", platform: "Console", deadline: "10 июля", desc: "Исследуй процедурно генерируемые галактики" },
-  { id: 9, title: "Ghost Recon: Reborn", genre: "Шутер", status: "active", testers: 28, rating: 4.6, reward: "800₽", img: "👻", platform: "PC", deadline: "5 июля", desc: "Тактический шутер с элементами стелса" },
+const filters = [
+  "Все игры", "Для вас", "Популярные", "Демоверсии",
+  "Инди", "Массовые", "Хоррор", "Выживание", "Уютные", "RPG", "Шутеры",
 ];
 
-const genres = ["Все", "RPG", "Шутер", "MOBA", "Гонки", "Roguelike", "Стратегия", "Симулятор"];
-const platforms = ["Все платформы", "PC", "Mobile", "Console"];
+const allGames: Game[] = [
+  { id: 1, title: "VELATO", desc: "VELATO — это однопользовательская игра в жанре приключений с глубоким сюжетом.", img: "", gradient: "bg-gradient-to-br from-purple-900 via-indigo-900 to-orange-900", emoji: "🗺️", status: "green", testType: "Открытая бета-версия", meta: "7 дней", platforms: ["steam", "android"] },
+  { id: 2, title: "Отнимающие Время", desc: "Каждая прожитая секунда — это секунда, которую ты больше не вернёшь.", img: "", gradient: "bg-gradient-to-br from-fuchsia-900 via-purple-800 to-cyan-800", emoji: "⏳", status: "green", testType: "Закрытое бета-тестирование", meta: "26", platforms: ["steam", "android", "app"] },
+  { id: 3, title: "Королевская дорога", desc: "Game of Thrones: Kingsroad — это ролевая игра в жанре фэнтези.", img: "", gradient: "bg-gradient-to-br from-slate-800 via-stone-800 to-zinc-900", emoji: "🐉", status: "red", testType: "Закрытое бета-тестирование", meta: "1 м", platforms: ["steam", "epic", "app", "android"] },
+  { id: 4, title: "ВЗБАДРИВАЮЩИЕ ПОЧ...", desc: "Это не обычная футбольная игра. Это хаотичная битва на поле.", img: "", gradient: "bg-gradient-to-br from-orange-700 via-amber-600 to-yellow-700", emoji: "⚽", status: "red", testType: "Закрытое бета-тестирование", meta: "2 м", platforms: ["steam", "android"] },
+  { id: 5, title: "Ограничьте количество", desc: "Limit Zero Breakers — динамичный экшен с аниме-стилистикой.", img: "", gradient: "bg-gradient-to-br from-sky-800 via-blue-900 to-indigo-900", emoji: "⚔️", status: "green", testType: "Открытое бета-тестирование", meta: "5 дней", platforms: ["steam", "android"] },
+  { id: 6, title: "Ржавый Мобиль", desc: "Rust Anytime Everywhere — выживай в открытом мире на колёсах.", img: "", gradient: "bg-gradient-to-br from-orange-900 via-amber-800 to-stone-800", emoji: "🏜️", status: "green", testType: "Закрытое бета-тестирование", meta: "12", platforms: ["android", "app"] },
+  { id: 7, title: "Фарлайт 84", desc: "Farlight 84 — королевская битва с героями и техникой.", img: "", gradient: "bg-gradient-to-br from-lime-700 via-green-700 to-emerald-800", emoji: "🤖", status: "red", testType: "Закрытое бета-тестирование", meta: "3 м", platforms: ["steam", "epic", "android", "app"] },
+  { id: 8, title: "Мехараши", desc: "Mecharashi — тактическая RPG с гигантскими роботами.", img: "", gradient: "bg-gradient-to-br from-red-900 via-orange-900 to-stone-900", emoji: "🦾", status: "red", testType: "Закрытое бета-тестирование", meta: "8", platforms: ["android", "app"] },
+  { id: 9, title: "Shadows of Eternity", desc: "Тёмное фэнтези с открытым миром и тактическими боями.", img: "", gradient: "bg-gradient-to-br from-violet-950 via-purple-900 to-slate-900", emoji: "🧙", status: "green", testType: "Открытая бета-версия", meta: "10 дней", platforms: ["steam", "epic"] },
+  { id: 10, title: "Neon Drift Racing", desc: "Аркадные гонки с неоновой эстетикой и дрифтом.", img: "", gradient: "bg-gradient-to-br from-pink-800 via-fuchsia-900 to-cyan-900", emoji: "🏎️", status: "green", testType: "Демоверсия", meta: "новинка", platforms: ["android", "app"] },
+  { id: 11, title: "Void Protocol", desc: "Шутер от первого лица в антиутопическом мире.", img: "", gradient: "bg-gradient-to-br from-zinc-800 via-slate-900 to-black", emoji: "🔫", status: "red", testType: "Закрытое бета-тестирование", meta: "4", platforms: ["steam", "epic"] },
+  { id: 12, title: "Pixel Farm Tycoon", desc: "Управляй фермой в милом пиксельном стиле.", img: "", gradient: "bg-gradient-to-br from-green-700 via-emerald-800 to-lime-900", emoji: "🌾", status: "green", testType: "Открытая бета-версия", meta: "новинка", platforms: ["android", "app"] },
+];
 
 export default function Games() {
+  const [active, setActive] = useState("Все игры");
   const [search, setSearch] = useState("");
-  const [genre, setGenre] = useState("Все");
-  const [platform, setPlatform] = useState("Все платформы");
-  const [sortBy, setSortBy] = useState("newest");
 
-  const filtered = allGames.filter((g) => {
-    const matchSearch = g.title.toLowerCase().includes(search.toLowerCase());
-    const matchGenre = genre === "Все" || g.genre === genre;
-    const matchPlatform = platform === "Все платформы" || g.platform === platform;
-    return matchSearch && matchGenre && matchPlatform;
-  });
+  const filtered = allGames.filter((g) =>
+    g.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-[#0a0d12]">
+    <div className="min-h-screen bg-black">
       <Navbar />
-      <div className="pt-24 pb-20 px-4">
-        <div className="max-w-7xl mx-auto">
+
+      <div className="pt-24 px-6 lg:px-12">
+        <div className="max-w-[1600px] mx-auto">
           {/* Header */}
-          <div className="mb-10">
-            <span className="text-xs font-medium text-green-400 tracking-widest uppercase">Каталог проектов</span>
-            <h1 className="text-4xl md:text-5xl font-['Rajdhani'] font-bold text-white mt-2 mb-2">
-              Все игры для тестирования
+          <div className="mb-8">
+            <h1 className="font-black text-4xl md:text-5xl text-white tracking-tight mb-2">
+              Исследовать игры
             </h1>
-            <p className="text-slate-500">Найди проект и начни зарабатывать</p>
+            <p className="text-white/45 text-[16px]">
+              Найди проект для тестирования и помоги разработчикам
+            </p>
           </div>
 
-          {/* Filters */}
-          <div className="glass-card rounded-xl p-5 mb-8 flex flex-wrap gap-4 items-center">
-            <div className="flex-1 min-w-[200px] relative">
-              <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Поиск игр..."
-                className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-green-400/40"
-              />
-            </div>
-            <select
-              value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-green-400/40"
-            >
-              {platforms.map((p) => <option key={p} value={p} className="bg-[#0a0d12]">{p}</option>)}
-            </select>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-green-400/40"
-            >
-              <option value="newest" className="bg-[#0a0d12]">Новые</option>
-              <option value="reward" className="bg-[#0a0d12]">По вознаграждению</option>
-              <option value="rating" className="bg-[#0a0d12]">По рейтингу</option>
-            </select>
-            <span className="text-xs text-slate-600">{filtered.length} проектов</span>
+          {/* Search */}
+          <div className="relative max-w-md mb-7">
+            <Icon name="Search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Поиск игр..."
+              className="w-full bg-white/[0.04] border border-white/15 rounded-full pl-11 pr-4 py-3 text-[15px] text-white placeholder:text-white/40 focus:outline-none focus:border-white/35 transition-colors"
+            />
           </div>
 
-          {/* Genre tabs */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {genres.map((g) => (
+          {/* Filter chips */}
+          <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-2 mb-8">
+            {filters.map((f) => (
               <button
-                key={g}
-                onClick={() => setGenre(g)}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  genre === g
-                    ? "bg-green-400/15 text-green-400 border border-green-400/30"
-                    : "text-slate-500 border border-white/10 hover:border-white/20 hover:text-white"
+                key={f}
+                onClick={() => setActive(f)}
+                className={`shrink-0 px-5 py-2.5 rounded-full text-[14px] whitespace-nowrap ${
+                  active === f ? "chip chip-active" : "chip"
                 }`}
               >
-                {g}
+                {f}
               </button>
-            ))}
-          </div>
-
-          {/* Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filtered.map((g) => (
-              <Link to={`/games/${g.id}`} key={g.id} className="glass-card rounded-xl overflow-hidden group block">
-                <div className="h-36 bg-gradient-to-br from-slate-800/50 to-slate-900/80 flex items-center justify-center text-6xl relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d12]/60 to-transparent" />
-                  <span className="relative z-10">{g.img}</span>
-                  <div className="absolute top-3 right-3 z-10">
-                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-wide ${
-                      g.status === "active" ? "badge-active" :
-                      g.status === "pending" ? "badge-pending" : "badge-closed"
-                    }`}>
-                      {g.status === "active" ? "АКТИВЕН" : g.status === "pending" ? "СКОРО" : "ЗАКРЫТ"}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-3 left-3 z-10">
-                    <span className="px-2 py-0.5 rounded-md text-[10px] bg-black/50 text-slate-300 border border-white/10">{g.platform}</span>
-                  </div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-['Rajdhani'] font-bold text-white text-lg leading-tight group-hover:text-green-400 transition-colors">{g.title}</h3>
-                      <span className="text-xs text-slate-500">{g.genre}</span>
-                    </div>
-                    <div className="text-right shrink-0 ml-3">
-                      <div className="text-green-400 font-['Rajdhani'] font-bold text-lg">{g.reward}</div>
-                      <div className="text-[10px] text-slate-600">за отчёт</div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-600 mb-3 leading-relaxed">{g.desc}</p>
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <div className="flex items-center gap-1"><Icon name="Users" size={11} />{g.testers} тестеров</div>
-                    {g.rating > 0 && <div className="flex items-center gap-1 text-yellow-400"><Icon name="Star" size={11} />{g.rating}</div>}
-                    <div className="flex items-center gap-1"><Icon name="Clock" size={11} />{g.deadline}</div>
-                  </div>
-                </div>
-              </Link>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Grid */}
+      <section className="max-w-[1600px] mx-auto px-6 lg:px-12 pb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-8">
+          {filtered.map((g) => (
+            <GameCard key={g.id} game={g} />
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <div className="text-center py-20 text-white/40">
+            <Icon name="SearchX" size={40} className="mx-auto mb-4 opacity-50" />
+            Игры не найдены
+          </div>
+        )}
+
+        <div className="flex justify-center mt-14">
+          <Link to="/games" className="px-8 py-3.5 rounded-full border border-white/20 text-white font-semibold text-[15px] hover:bg-white/5 transition-colors">
+            Показать больше игр
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
